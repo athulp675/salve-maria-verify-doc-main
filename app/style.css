@@ -1,0 +1,92 @@
+form{
+    padding:30px;
+    background-color: rgba(99, 117, 252, 0.26);
+}
+.form-control{
+    max-width:350px;
+}
+.btn-primary{
+    padding: 4px;
+}
+#cover-spin {
+    position:fixed;
+    width:100%;
+    left:0;right:0;top:0;bottom:0;
+    background-color: rgba(255,255,255,0.7);
+    z-index:9999;
+    display:none;
+}
+
+@-webkit-keyframes spin {
+	from {-webkit-transform:rotate(0deg);}
+	to {-webkit-transform:rotate(360deg);}
+}
+
+@keyframes spin {
+	from {transform:rotate(0deg);}
+	to {transform:rotate(360deg);}
+}
+
+#cover-spin::after {
+    content:'';
+    display:block;
+    position:absolute;
+    left:48%;top:40%;
+    width:40px;height:40px;
+    border-style:solid;
+    border-color:black;
+    border-top-color:transparent;
+    border-width: 4px;
+    border-radius:50%;
+    -webkit-animation: spin .8s linear infinite;
+    animation: spin .8s linear infinite;
+}
+.hide{
+    display: none;
+}
+
+.btn info{
+    border: none;
+    background-color: inherit;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-block;
+  }
+  /* On mouse-over */
+/* .btn:hover {background: #eee;} */
+.info {color: dodgerblue;}
+
+/* Preview modal  */
+
+.top-bar {
+    background: #333;
+    color: #fff;
+    padding: 1rem;
+  }
+  
+  .btn-preview {
+    background: coral;
+    color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0.7rem 2rem;
+  }
+  
+  .btn-preview:hover {
+    opacity: 0.9;
+  }
+  
+  .page-info {
+    margin-left: 1rem;
+  }
+  
+  .error {
+    background: orangered;
+    color: #fff;
+    padding: 1rem;
+  }
+  /* https://crmsandbox.zoho.com/crm/org765011388/specific/ViewAttachment?fileId=pp98hc58713defeda444492d45658e01ec633&module=CustomModule7&parentId=4995768000000563393&creatorId=4995768000000345157&id=4995768000000563394&name=akhil+b+resume.pdf&downLoadMode=pdfViewPlugin&attach=undefined
+ dwnld "/crm/org765011388/specific/ViewAttachment?fileId=pp98hc58713defeda444492d45658e01ec633&module=CustomModule7&parentId=4995768000000563393&creatorId=4995768000000345157&id=4995768000000563394&name=akhil+b+resume.pdf&downLoadMode=default"
+preview "/crm/org765011388/specific/ViewAttachment?fileId=pp98hc58713defeda444492d45658e01ec633&module=CustomModule7&parentId=4995768000000563393&creatorId=4995768000000345157&id=4995768000000563394&name=akhil+b+resume.pdf&downLoadMode=pdfViewPlugin&attach=undefined" */
