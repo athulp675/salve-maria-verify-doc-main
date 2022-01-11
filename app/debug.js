@@ -30,7 +30,6 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 
 //>>>>>>>>>>>>>>>>Fetch Details from module and show it in the table 
 function fetchData() {
-   
     document.getElementById("tablebody").innerHTML = "";
     var resp_related = ZOHO.CRM.API.searchRecord({
         Entity: "Candidate_Documents",
@@ -213,7 +212,6 @@ button.addEventListener("click", (e) => {
         console.log(resp);
         fileid = resp.data[0].details.id;
         console.log(`fileid=${fileid}`);
-        console.log(fileid);
         var recordData = {
             Name: document.getElementById("docname").value,
             Document_Type: document.getElementById("filetype").value,
@@ -240,118 +238,95 @@ button.addEventListener("click", (e) => {
 //>>>>>>>>>>>>>>Uploading file from modal window.This should be refactored with file upload in add new record <<<<<<<<<<
 
 modalSubmitButton.addEventListener("click", () => {
-  
-    // var config={
-    //     Entity:"Experiences",
-    //     APIData: 
-    //          { "id": document.getElementById("recordId").value,
-    //            "Name": document.getElementById("modalJobTitle").value,
-    //            "Company": document.getElementById("modalCompanyName").value,
-    //            "From": document.getElementById("modalFrom").value,
-    //            "To": document.getElementById("modalTo").value,
-    //            "Job_Responsibility" : document.getElementById("modalResponsibility").value,
-    //            "Is_Experience_Related_to_Higher_Qualification" : document.getElementById("modalRelation").value,
-    //            "Current_Job": document.getElementById("modalCurrentjob").checked,
-    //          },
-              
+    var id= document.getElementById("uploadrecordId").value;
+    console.log("id");
+    console.log(id);
     
-        
-    //     Trigger:["workflow"]
-    //   }
-    //   ZOHO.CRM.API.updateRecord(config)
-    //   .then(function(data){
-    //       console.log(data)
-    //       fetchData();
-    //   })
-   var id=  document.getElementById("uploadrecordId").value
-   console.log(id)
-  var updatedata=
+//////////////////Delete file///////////////
+   var deltfile= {
+      
+        "data": [
             {
-                "id" :"4995768000000605095",
-                "Documents": [
+                "Candidate_Documents": [
                     {
-                        
-                        "attachment_id": "4995768000000605096",
+                        "id":"4995768000000605118",
+                        "attachment_id": "4995768000000605119",
                         "_delete": null
-                    }
+                    },   
                 ]
             }
         
-    
-       var config= {
-           
-        Entity:"Candidate_Documents",
-        APIData:updatedata,
-     
-    Trigger:["workflow"],
-    }
-    ZOHO.CRM.API.updateRecord(config)
-          .then(function(data){
-              console.log("Delete API executed")
-              console.log(data)
-    console.log("delete file");
-    
-    var recordid = document.getElementById("uploadrecordId").value;
-    var modalfile = document.getElementById("modaluploadfile").files[0];
-
-    console.log("record id");
-    console.log(recordid);
-
-    var modal_upload_config = {
-        CONTENT_TYPE: "multipart",
-        PARTS: [
-            {
-                headers: {
-                    "Content-Disposition": "file;",
-                },
-                content: "__FILE__",
-            },
         ],
-        FILE: {
-            fileParam: "content",
-            file: modalfile,
-        },
-    };
+    
+  }
+  console.log(deltfile);
+   ZOHO.CRM.API.updateRecord(deltfile)
+   .then(function(resp){
+       console.log("file delete API excecuted ");
+       console.log(resp);
 
-    ZOHO.CRM.API.uploadFile(modal_upload_config).then(function (resp) {
+
+//////////////uploading New FIle//////////////////////
+       var recordid = document.getElementById("uploadrecordId").value;
+       var modalfile = document.getElementById("modaluploadfile").files[0];
+   
+       console.log("record id");
+       console.log(recordid);
+   
+       var modal_upload_config = {
+           CONTENT_TYPE: "multipart",
+           PARTS: [
+               {
+                   headers: {
+                       "Content-Disposition": "file;",
+                   },
+                   content: "__FILE__",
+               },
+           ],
+           FILE: {
+               fileParam: "content",
+               file: modalfile,
+           },
+       };
+       ZOHO.CRM.API.uploadFile(modal_upload_config).then(function(resp){
         console.log("uploaded file");
         console.log(resp);
         var uploadedfileid = resp.data[0].details.id;
-        console.log(`fileid=${uploadedfileid}`);
-        var doc=[{ file_id:uploadedfileid }];
-        console.log(doc);
-var rid=document.getElementById("uploadrecordId").value;
-
-var apidata={  
-    "id": document.getElementById("uploadrecordId").value,
-    "Name": document.getElementById("modaldocname").value,
-    "Document_Type": document.getElementById("modalfiletype").value,
-    "Document_Status": document.getElementById("modalfilestatus").value,
-    // File_Upload_Id:uploadedfileid,
-    "Document": [{ "file_id": uploadedfileid }],
-    
-    // file_Name: document.getElementById("modaluploadfile").value,
- }
- console.log(apidata);
+        console.log(`uploadedfileid=${uploadedfileid}`);
+////////////////update edited records///////////////////
         var config={
             Entity:"Candidate_Documents",
-            APIData: apidata,
+            APIData: 
+                 {  id: document.getElementById("uploadrecordId").value,
+                    Name: document.getElementById("modaldocname").value,
+                    Document_Type: document.getElementById("modalfiletype").value,
+                    Document_Status: document.getElementById("modalfilestatus").value,
+                    Lead: leadId,
+                    Document: [{ file_id: uploadedfileid }],
+
+                    file_Name: document.getElementById("modaluploadfile").value,
+                 },
                    
             Trigger:["workflow"]
           }
-        //   console.log(config);
-          ZOHO.CRM.API.updateRecord(config)
-          .then(function(data){
-              console.log("update API executed")
-              console.log(data)
-              
-            fetchData();
+          console.log(config);
+          ZOHO.CRM.API.updateRecord(config).then(function(data){
+            console.log("update API executed")
+            console.log(data)
+            
+          fetchData();
           })
-      
+       })
 
-    });
+    })
+    .catch(err => {
+        console.error(err)
+        console.log(deltfile)
+    })
+
 });
-})
+
+
 /////////////////////////Preview modal///////////////////////////////
 
 
@@ -382,3 +357,80 @@ remarksubmit.addEventListener("click", () => {
 
 
 ZOHO.embeddedApp.init();
+
+
+// //Get instance of RecordOperations Class
+// let recordOperations = new ZCRM.Record.Operations();
+// //Get instance of BodyWrapper Class that will contain the request body
+// let request = new ZCRM.Record.Model.BodyWrapper();
+// //Array to hold Record instances
+// let recordsArray = [];
+// let record1 = new ZCRM.Record.Model.Record();
+// //ID of the record to be updated
+// record1.setId(34770619074373n);
+// /*
+//  * Call addFieldValue method that takes two arguments
+//  * 1 -> Call Field "." and choose the module from the displayed list and press "." and choose the field name from the displayed list.
+//  * 2 -> Value
+//  */
+// record1.addFieldValue(ZCRM.Record.Model.Field.Leads.CITY, "City");
+// record1.addFieldValue(ZCRM.Record.Model.Field.Leads.LAST_NAME, "Last Name");
+// record1.addFieldValue(ZCRM.Record.Model.Field.Leads.FIRST_NAME, "First Name");
+// record1.addFieldValue(ZCRM.Record.Model.Field.Leads.COMPANY, "KKRNP");
+// /*
+//  * Call addKeyValue method that takes two arguments
+//  * 1 -> A string that is the Field's API Name
+//  * 2 -> Value
+//  */
+// record1.addKeyValue("Custom_field", "Custom val");
+// record1.addKeyValue("Custom_field_2", 10);
+// //Used when GDPR is enabled
+// let dataConsent = new ZCRM.Record.Model.Consent();
+// dataConsent.setConsentRemarks("Approved.");
+// dataConsent.setConsentThrough("Email");
+// dataConsent.setContactThroughEmail(true);
+// dataConsent.setContactThroughSocial(false);
+// record1.addKeyValue("Data_Processing_Basis_Details", dataConsent);
+// recordsArray.push(record1);
+// let record2 = new ZCRM.Record.Model.Record();
+// //ID of the record to be updated
+// record2.addFieldValue(ZCRM.Record.Model.Field.Leads.ID, 34096431881002n);
+// /*
+//  * Call addFieldValue method that takes two arguments
+//  * 1 -> Call Field "." and choose the module from the displayed list and press "." and choose the field name from the displayed list.
+//  * 2 -> Value
+//  */
+// record2.addFieldValue(ZCRM.Record.Model.Field.Leads.CITY, "City");
+// record2.addFieldValue(ZCRM.Record.Model.Field.Leads.LAST_NAME, "Last Name");
+// record2.addFieldValue(ZCRM.Record.Model.Field.Leads.FIRST_NAME, "First Name");
+// record2.addFieldValue(ZCRM.Record.Model.Field.Leads.COMPANY, "KKRNP");
+// /*
+//  * Call addKeyValue method that takes two arguments
+//  * 1 -> A string that is the Field's API Name
+//  * 2 -> Value
+//  */
+// record2.addKeyValue("Custom_field", "Value");
+// record2.addKeyValue("Custom_field_2", "value");
+// //Add Record instance to the array
+// recordsArray.push(record2);
+// //Set the array to data in BodyWrapper instance
+// request.setData(recordsArray);
+// let trigger = [];
+// trigger.push("approval");
+// trigger.push("workflow");
+// trigger.push("blueprint");
+// //Set the array containing the trigger operations to be run
+// request.setTrigger(trigger);
+// //Call updateRecords method that takes BodyWrapper instance and moduleAPIName as parameter.
+// let response = await recordOperations.updateRecords(moduleAPIName, request);
+//Get instance of AttachmentsOperations Class that takes recordId and moduleAPIName as parameter
+
+// let attachmentsOperations = new ZCRM.Attachment.Operations(moduleAPIName, recordId);
+// //Get instance of ParameterMap Class
+// let paramInstance = new ParameterMap();
+// for(let attachmentId of attachmentIds) {
+//     //Add the ids to parameter map instance
+//     await paramInstance.add(ZCRM.Attachment.Model.DeleteAttachmentsParam.IDS, attachmentId);
+// }
+// //Call deleteAttachments method that takes paramInstance as parameter
+// let response = await attachmentsOperations.deleteAttachments(paramInstance);
