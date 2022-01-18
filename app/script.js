@@ -7,7 +7,6 @@ var status_select = document.querySelector(".status-select");
 console.log(status_select);
 togglebtn.addEventListener("click", controlButton);
 var previewbtn= document.getElementById("previewBtn");
-
 var modalSubmitButton = document.getElementById("modalsubmit");
 
 //**********************************Page On Load**********************************************/
@@ -19,8 +18,6 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
     entity = data.Entity;
     console.log(`Entity=${entity}`);
     console.log(`Entity Id=${leadId}`);
-    // const resp=ZOHO.CRM.API.getRelatedRecords({Entity:"Leads",RecordID:leadId,RelatedList:"Candidate_Documents_Verify"})
-    // console.log(resp)
     fetchData();
     getFIle();
 });
@@ -30,7 +27,7 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 
 //>>>>>>>>>>>>>>>>Fetch Details from module and show it in the table 
 function fetchData() {
-   
+
     document.getElementById("tablebody").innerHTML = "";
     var resp_related = ZOHO.CRM.API.searchRecord({
         Entity: "Candidate_Documents",
@@ -50,22 +47,14 @@ function fetchData() {
                 var cell5 = row.insertCell(4);
 
                 cell1.innerHTML = element.Name;
-                // var previewtable = document.createElement("button");
-                // // previewtable.setAttribute("data-toggle", "collapse");
-                // // previewtable.setAttribute("data-target", "#body");
-                // previewtable.innerHTML = "Preview";
-                // previewtable.id= "previewBtn";
-                // previewtable.href="https://crmsandbox.zoho.com/crm/org765011388/specific/ViewAttachment?fileId=i5jwtcf7873e2a57f4a5db7df7fe2ef98e107&module=CustomModule7&parentId=4995768000000589006&creatorId=4995768000000345157&id=4995768000000589007&name=pdf.pdf&downLoadMode=pdfViewPlugin";
-                // previewtable.target = "_blank";
-                // previewtable.className= "btn info";
                 var dwnldlink= element.Document[0].download_Url;
-                // console.log(dwnldlink);
                 var previewtable= document.createElement("a");
                 previewtable.href = "https://crmsandbox.zoho.com"+ dwnldlink;
                 previewtable.className = "btn info";
                 previewtable.innerHTML = "Preview";
                 previewtable.target = "_blank";
                 cell1.appendChild( previewtable);
+
 
                 cell2.innerHTML = element.Document_Type;
                 cell2.style = "max-width: 35px;";
@@ -78,7 +67,7 @@ function fetchData() {
                         cell3.innerHTML= element.data[0].details.name
                     }
 
-                
+
                     var uploadfile = document.createElement("button");
                     uploadfile.type = "button";
                     uploadfile.setAttribute("data-toggle", "modal");
@@ -86,21 +75,22 @@ function fetchData() {
                     uploadfile.innerHTML = "Edit File";
                     uploadfile.className = "btn info";
                     uploadfile.onclick = () => {
-                        
+
                         //**Updating element id to the modal form */
                         console.log("editclicked");
                         document.getElementById("uploadrecordId").value = element.id;
+                        document.getElementById("attachmentId").value= element.Document[0].attachment_Id;
                         document.getElementById("modaldocname").value= element.Name;
                         document.getElementById("modalfiletype").value= element.Document_Type;
                         document.getElementById("modalfilestatus").value= element.Document_Status;
                         // document.getElementById("uploadfile").value= element.file_Name;
 
-                        
-                          
+
+
                     };
                     cell3.appendChild(uploadfile); 
-                
-                
+
+
 
                 var values = ["Pending", "Received", "Verified"];
                 var select = document.createElement("select");
@@ -169,19 +159,6 @@ function controlButton() {
         document.getElementById("table").classList.remove("hide");
     }
 }
-/////////////////////////Previe Button/////////////////
-
-// function previewButton(){
-//     console.log("preview button clilcked");
-//     if(previewbtn.innerHTML==="Preview"){
-//         document.getElementById("table").classList.add("hide");
-//         togglebtn.innerHTML = "Close X";
-//         togglebtn.classList.toggle("bg-danger");
-//         document.getElementById("body").style = "display:inherit";
-//     }
-    
-// }
-
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Submit Form<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 button.addEventListener("click", (e) => {
@@ -208,7 +185,7 @@ button.addEventListener("click", (e) => {
     };
 
     ZOHO.CRM.API.uploadFile(config).then(function (resp) {
-        
+
         console.log("uploaded file");
         console.log(resp);
         fileid = resp.data[0].details.id;
@@ -240,49 +217,30 @@ button.addEventListener("click", (e) => {
 //>>>>>>>>>>>>>>Uploading file from modal window.This should be refactored with file upload in add new record <<<<<<<<<<
 
 modalSubmitButton.addEventListener("click", () => {
-  
-    // var config={
-    //     Entity:"Experiences",
-    //     APIData: 
-    //          { "id": document.getElementById("recordId").value,
-    //            "Name": document.getElementById("modalJobTitle").value,
-    //            "Company": document.getElementById("modalCompanyName").value,
-    //            "From": document.getElementById("modalFrom").value,
-    //            "To": document.getElementById("modalTo").value,
-    //            "Job_Responsibility" : document.getElementById("modalResponsibility").value,
-    //            "Is_Experience_Related_to_Higher_Qualification" : document.getElementById("modalRelation").value,
-    //            "Current_Job": document.getElementById("modalCurrentjob").checked,
-    //          },
-              
-    
-        
-    //     Trigger:["workflow"]
-    //   }
-    //   ZOHO.CRM.API.updateRecord(config)
-    //   .then(function(data){
-    //       console.log(data)
-    //       fetchData();
-    //   })
-   var id=  document.getElementById("uploadrecordId").value
-   console.log(id)
+
+   var id=  document.getElementById("uploadrecordId").value;
+   console.log(id);
+   var attId= document.getElementById("attachmentId").value;
+   
+   console.log(attId);
   var updatedata=
             {
-                "id" :"4995768000000605095",
+                "id" : id,
                 "Documents": [
                     {
-                        
-                        "attachment_id": "4995768000000605096",
+
+                        "attachment_id": attId,
                         "_delete": null
                     }
                 ]
             }
-        
-    
+
+
        var config= {
-           
+
         Entity:"Candidate_Documents",
         APIData:updatedata,
-     
+
     Trigger:["workflow"],
     }
     ZOHO.CRM.API.updateRecord(config)
@@ -290,7 +248,7 @@ modalSubmitButton.addEventListener("click", () => {
               console.log("Delete API executed")
               console.log(data)
     console.log("delete file");
-    
+
     var recordid = document.getElementById("uploadrecordId").value;
     var modalfile = document.getElementById("modaluploadfile").files[0];
 
@@ -329,32 +287,28 @@ var apidata={
     "Document_Status": document.getElementById("modalfilestatus").value,
     // File_Upload_Id:uploadedfileid,
     "Document": [{ "file_id": uploadedfileid }],
-    
+
     // file_Name: document.getElementById("modaluploadfile").value,
  }
  console.log(apidata);
         var config={
             Entity:"Candidate_Documents",
             APIData: apidata,
-                   
+
             Trigger:["workflow"]
           }
-        //   console.log(config);
           ZOHO.CRM.API.updateRecord(config)
           .then(function(data){
               console.log("update API executed")
               console.log(data)
-              
+
             fetchData();
           })
-      
+
 
     });
 });
 })
-/////////////////////////Preview modal///////////////////////////////
-
-
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Remark Modal handling<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //>>>>>>>>>>>closing remark modal
 var closeRemarkModal = document.getElementById("closeremark");
