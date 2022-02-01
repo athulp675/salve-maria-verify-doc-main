@@ -77,8 +77,7 @@
             </tbody>
         </table>
     </section>
-    
-    <!-- Modal for uploading Doc and Editing -->
+   <!-- Modal for uploading Doc and Editing -->
     <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -91,15 +90,15 @@
                 </div>
                 <div class="modal-body">
                     <form class="form row g-3 text-dark font-weight-bold" id="modalForm">
-                        <div>
-                            <input type="hidden" id="uploadrecordId"></input>
-                            <input type="hidden" id="attachmentId"></input>
+                        <div style="display:none;">
+                            <input id="uploadrecordId"></input>
+                            <input  id="attachmentId"></input>
                         </div>
                         
                         
                             <div>
                                 <label for="modaldocname">Document Name:</label>
-                                <input type="docname" class="form-control" placeholder="File Name" id="modaldocname" required>
+                                <input type="modaldocname" class="form-control" placeholder="File Name" id="modaldocname" required>
                             </div>
                             <div >
                                 <label for="modalfiletype">Document Type:</label>
@@ -117,7 +116,7 @@
                             </div>
                             <div>
                                 <label for="modaluploadfile">Upload File:</label>
-                                <input type="file" class=" form-control" id="modaluploadfile" required></input>
+                                <input type="file" class="form-control" id="modaluploadfile" required></input>
                             </div>
                             <div>
                                 <label for="modalfilestatus">Status:</label>
