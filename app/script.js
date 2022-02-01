@@ -49,7 +49,7 @@ function fetchData() {
                 cell1.innerHTML = element.Name;
                 var dwnldlink= element.Document[0].download_Url;
                 var previewtable= document.createElement("a");
-                previewtable.href = "https://crmsandbox.zoho.com"+ dwnldlink;
+                previewtable.href = "https://crm.zoho.com"+ dwnldlink;
                 previewtable.className = "btn info";
                 previewtable.innerHTML = "Preview";
                 previewtable.target = "_blank";
@@ -60,11 +60,10 @@ function fetchData() {
                 cell2.style = "max-width: 35px;";
                 cell3.style = "max-width: 35px;";
                 if (element.Document) {
-                    console.log("Document");
-                    console.log(element.Document);
+                    
                     cell3.innerHTML = element.Document[0].file_Name;}
                     else if(modalSubmitButton.click==true){
-                        cell3.innerHTML= element.data[0].details.name
+                        cell3.innerHTML= element.data[0].details.name;
                     }
 
 
@@ -78,20 +77,18 @@ function fetchData() {
 
                         //**Updating element id to the modal form */
                         console.log("editclicked");
+                        console.log(element);
+                        var fileId = element.Document[0].file_Id;
+                        console.log(fileId);
                         document.getElementById("uploadrecordId").value = element.id;
                         document.getElementById("attachmentId").value= element.Document[0].attachment_Id;
+                        
                         document.getElementById("modaldocname").value= element.Name;
                         document.getElementById("modalfiletype").value= element.Document_Type;
                         document.getElementById("modalfilestatus").value= element.Document_Status;
-                        // document.getElementById("uploadfile").value= element.file_Name;
-
-
-
                     };
                     cell3.appendChild(uploadfile); 
-
-
-
+                
                 var values = ["Pending", "Received", "Verified"];
                 var select = document.createElement("select");
                 select.name = "status";
@@ -114,7 +111,6 @@ function fetchData() {
                                 Document_Status: select.value,
                             },
                         };
-                        console.log(config);
                         ZOHO.CRM.API.updateRecord(config).then(function (data) {
                             console.log(data);
                         });
@@ -145,7 +141,7 @@ function fetchData() {
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Control Toggle<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 function controlButton() {
-    console.log("Clicked on Toggle Button");
+    // console.log("Clicked on Toggle Button");
     if (togglebtn.innerHTML === "Add New File") {
         document.getElementById("table").classList.add("hide");
         togglebtn.innerHTML = "Close X";
@@ -186,15 +182,16 @@ button.addEventListener("click", (e) => {
 
     ZOHO.CRM.API.uploadFile(config).then(function (resp) {
 
-        console.log("uploaded file");
-        console.log(resp);
+         console.log("uploaded file for first time");
+        // console.log(resp);
         fileid = resp.data[0].details.id;
-        console.log(`fileid=${fileid}`);
-        console.log(fileid);
+        console.log(`uploaded fileid first time=${fileid}`);
+        // console.log(fileid);
         var recordData = {
             Name: document.getElementById("docname").value,
             Document_Type: document.getElementById("filetype").value,
             Lead: leadId,
+            File_Upload_Id: fileid,
             Document: [{ file_id: fileid }],
             Document_Status: document.getElementById("filestatus").value,
         };
@@ -203,6 +200,7 @@ button.addEventListener("click", (e) => {
             APIData: recordData,
             Trigger: ["workflow"],
         }).then(function (data) {
+            console.log("candidate doc record creation =")
             console.log(data);
             fetchData();
             controlButton();
@@ -218,44 +216,39 @@ button.addEventListener("click", (e) => {
 
 modalSubmitButton.addEventListener("click", () => {
 
-   var id=  document.getElementById("uploadrecordId").value;
-   console.log(id);
-   var attId= document.getElementById("attachmentId").value;
-   
-   console.log(attId);
-  var updatedata=
-            {
-                "id" : id,
-                "Documents": [
-                    {
-
-                        "attachment_id": attId,
-                        "_delete": null
-                    }
-                ]
-            }
-
-
-       var config= {
+    var uploadRecrdId=  document.getElementById("uploadrecordId").value;
+       console.log(`candidate doc record id=${uploadRecrdId}`);
+       var attId= document.getElementById("attachmentId").value;
+       console.log(`attchmnt server id needs to be deleted =${attId}`);
+//**To remove previous uploaded file **//
+       var config={
 
         Entity:"Candidate_Documents",
-        APIData:updatedata,
-
-    Trigger:["workflow"],
-    }
-    ZOHO.CRM.API.updateRecord(config)
-          .then(function(data){
-              console.log("Delete API executed")
-              console.log(data)
-    console.log("delete file");
-
-    var recordid = document.getElementById("uploadrecordId").value;
-    var modalfile = document.getElementById("modaluploadfile").files[0];
-
-    console.log("record id");
-    console.log(recordid);
-
-    var modal_upload_config = {
+      
+        APIData:{
+      
+              "id":  uploadRecrdId,
+      
+              "Document":[{"attachment_id": attId,
+                            "_delete":null}]
+      
+        },
+      
+        Trigger:["workflow"]
+      
+      }
+      
+      ZOHO.CRM.API.updateRecord(config)
+      
+      .then(function(data){
+      
+        console.log(data)
+      
+        var recordid = document.getElementById("uploadrecordId").value;
+        var modalfile = document.getElementById("modaluploadfile").files[0];
+        
+///// To Upload New File //////// 
+            var modal_upload_config = {
         CONTENT_TYPE: "multipart",
         PARTS: [
             {
@@ -271,32 +264,25 @@ modalSubmitButton.addEventListener("click", () => {
         },
     };
 
-    ZOHO.CRM.API.uploadFile(modal_upload_config).then(function (resp) {
-        console.log("uploaded file");
+         ZOHO.CRM.API.uploadFile(modal_upload_config).then(function (resp) {
+        console.log("new file uploaded to server");
         console.log(resp);
         var uploadedfileid = resp.data[0].details.id;
-        console.log(`fileid=${uploadedfileid}`);
-        var doc=[{ file_id:uploadedfileid }];
-        console.log(doc);
-var rid=document.getElementById("uploadrecordId").value;
-
-var apidata={  
-    "id": document.getElementById("uploadrecordId").value,
-    "Name": document.getElementById("modaldocname").value,
-    "Document_Type": document.getElementById("modalfiletype").value,
-    "Document_Status": document.getElementById("modalfilestatus").value,
-    // File_Upload_Id:uploadedfileid,
-    "Document": [{ "file_id": uploadedfileid }],
-
-    // file_Name: document.getElementById("modaluploadfile").value,
- }
- console.log(apidata);
+        console.log(`newly uploaded server fileid=${uploadedfileid}`);
+///////// Modal record updating//////        
         var config={
             Entity:"Candidate_Documents",
-            APIData: apidata,
-
-            Trigger:["workflow"]
+            APIData:{
+                id :  document.getElementById("uploadrecordId").value, 
+                Document :[uploadedfileid],
+                Name : document.getElementById("modaldocname").value,
+                Document_Type: document.getElementById("modalfiletype").value,
+                Document_Status : document.getElementById("modalfilestatus").value 
+          },
+            
           }
+          console.log("payload for newly upload")
+          console.log(config);
           ZOHO.CRM.API.updateRecord(config)
           .then(function(data){
               console.log("update API executed")
@@ -304,10 +290,9 @@ var apidata={
 
             fetchData();
           })
-
-
-    });
-});
+    })
+ 
+ });
 })
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Remark Modal handling<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //>>>>>>>>>>>closing remark modal
